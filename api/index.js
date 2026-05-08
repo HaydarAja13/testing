@@ -1,0 +1,27 @@
+const express = require("express");
+const express = require("dotenv");
+const { createClient } = require("@supabase/supabase-js");
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("Hello from me");
+});
+
+app.get("/todos", async (req, res) => {
+  const { data, error } = await supabase.from("todos").select("*");
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(200).json(data);
+});
+
+module.exports = app;
